@@ -1,7 +1,9 @@
 const WebSocket = require('ws')
-const Methods = require('./methods')
+const Topics = require('./topics')
 
 const { normalizePort, safeParseJSON, generateError } = require('../helpers')
+
+const connectedNodes = new Set();
 
 const WSS = new WebSocket.Server({
   port: normalizePort(process.env.SOCKET_PORT || 8080)
@@ -33,24 +35,29 @@ WSS.on('connection', ws => {
           })
         )
       )
-    } else if (typeof data.method === 'string' && Methods[data.method]) {
-      Methods[data.method](WSS, ws, data)
+    } else if (typeof data.topic === 'string' && Topics[data.topic]) {
+      Topics[data.topic](WSS, ws, data, connectedNodes)
     } else {
       ws.send(
         JSON.stringify(
           generateError({
-            error: 'Method Not Found',
+            error: 'Topic Not Found',
             reasons: [
               {
-                reason: 'invalid_method',
-                message: 'Unable to find matching method',
+                reason: 'invalid_topic',
+                message: 'Unable to find matching topic',
                 data: data.method,
-                location: 'method'
+                location: 'topics'
               }
             ]
           })
         )
       )
     }
-  })
+  });
+
+  /*WSS.on('close', () => {
+    
+  })*/
+
 })
