@@ -10,6 +10,10 @@
 	by Tom Igoe
 */
 
+const { generateInstruction, generateInitialization } = require('../sockets/topics/socket_helpers')
+
+let isInit = false;
+
 var WebSocket = require('ws');
 var stdin = process.openStdin();	// enable input from the keyboard
 stdin.setEncoding('utf8');			  // encode everything typed as a string
@@ -19,12 +23,25 @@ var ws = new WebSocket('ws://localhost:8080/');
 ws.on('open', function open() {
 	// this function runs if there's input from the keyboard.
 	// you need to hit enter to generate this event.
+
+	ws.send(JSON.stringify(
+		generateInitialization({
+			topic: "light",
+			targetID: "test_client",
+			type: "dependent",
+			isSuccess: false
+		})
+	))
+
 	function sendMessage(data) {
 		data = data.trim();
 		ws.send(data);
 	}
   stdin.on('data', sendMessage);
-	ws.send(JSON.stringify({topic: 'light'}));
+	ws.send(JSON.stringify({
+		topic: 'light',
+		node: "switch"
+	}));
 });
 
 ws.on('error', function(error) {

@@ -16,6 +16,9 @@ WSS.on('listening', () => {
 })
 
 WSS.on('connection', ws => {
+
+  //handle initialization stuff for nodes
+
   ws.on('message', message => {
     const data = safeParseJSON(message)
 
@@ -36,7 +39,8 @@ WSS.on('connection', ws => {
         )
       )
     } else if (typeof data.topic === 'string' && Topics[data.topic]) {
-      Topics[data.topic](WSS, ws, data, connectedNodes)
+      Topics[data.topic](WSS, ws, data); // hand socket connection and data to desired topic
+      connectedNodes.push(ws); // push new socket to connected nodes set
     } else {
       ws.send(
         JSON.stringify(
@@ -56,8 +60,5 @@ WSS.on('connection', ws => {
     }
   });
 
-  /*WSS.on('close', () => {
-    
-  })*/
 
 })
