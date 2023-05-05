@@ -1,6 +1,6 @@
 const { IndependentNode, DependentNode } = require('./node_declerations/index.js');
 
-const { generateInstruction, generateInitialization, generateTargetSuccess } = require('./socket_helpers/index.js')
+const { generateInstruction, generateInitialization, generateTargetSuccess, handleTarget } = require('./socket_helpers/index.js')
 
 const connectedLightNodes = new Set()
 
@@ -14,8 +14,12 @@ module.exports = (wss, ws, data) => {
         isInit = true;
       } else if (data.type == "independent") {
         newNode = new IndependentNode(data.topic, data.sourceID, ws, data.state);
+
+        handleTarget(connectedLightNodes, newNode, data);
+
         isInit = true;
       }
+
 
       ws.send(JSON.stringify(generateInitialization({
         topic: newNode.getTopic(),
@@ -31,7 +35,10 @@ module.exports = (wss, ws, data) => {
       console.log('Connected Nodes: ');
 
       for(let node of connectedLightNodes)  {
-        console.log('NodeID: %s, Type: %s, State: %i',node.getID(), node.getType() ,node.getState());
+        console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',node.getID(), node.getTarget(), node.getType() ,node.getState());
       }
     }
+
+
+
   }

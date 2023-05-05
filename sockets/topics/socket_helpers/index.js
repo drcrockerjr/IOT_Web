@@ -20,7 +20,7 @@
  * @return The rendered Instruction message to be sent
  */
 
-module.exports.generateInstruction = ({ topic, targetID, instructions = [] }) => {
+const generateInstruction = ({ topic, targetID, instructions = [] }) => {
     return {
         topic: topic,
         targetID: targetID, 
@@ -50,7 +50,7 @@ module.exports.generateInstruction = ({ topic, targetID, instructions = [] }) =>
  * @return The rendered Initialization message sent to node on sucessfull initialization
  */
 
-module.exports.generateInitialization = (({ topic, sourceID, targetID, type, state}) => {
+const generateInitialization = (({ topic, sourceID, targetID, type, state}) => {
     return {
         topic: topic,
         sourceID: sourceID,
@@ -73,7 +73,7 @@ module.exports.generateInitialization = (({ topic, sourceID, targetID, type, sta
  * @return The rendered Initialization message sent to node on sucessfull dendependent and independant node linkage. Is sent by the Independent node or controller.
  */
 
-module.exports.generateTargetSuccess = (({ topic, sourceID, targetID}) => {
+const generateTargetSuccess = (({ topic, sourceID, targetID}) => {
     return {
         topic: topic,
         sourceID: sourceID,
@@ -81,3 +81,18 @@ module.exports.generateTargetSuccess = (({ topic, sourceID, targetID}) => {
     }
 })
 
+
+const handleTarget = (nodes, newNode, message) => {
+    for (let node of nodes) {
+        if (message.targetID == node.getID()) {
+            newNode.setTarget(node);
+        }
+    }
+}
+
+module.exports = { 
+    generateInstruction, 
+    generateInitialization, 
+    generateTargetSuccess, 
+    handleTarget 
+}

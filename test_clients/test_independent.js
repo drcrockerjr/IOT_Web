@@ -19,7 +19,7 @@ ws.on('open', function open() {
 			topic: "light",
 			sourceID: "test_independent",
             targetID: "test_dependent",
-			type: "dependent",
+			type: "independent",
 			state: 0
 		})
 	))
