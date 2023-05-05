@@ -1,8 +1,60 @@
 
-const DependentNode = (ID, socket, type) => {
-    let topic;
-    let state = null;
+class Node {
+    constructor(topic, id, sock, state) {
+        this.topic = topic;
+        this.id = id;
+        this.socket = sock;
+        this.state = state;
+    }
 
+    getTopic() { return this.topic; }
+    getID() { return this.id; }
+    getSocket() { return this.socket; }
+    getState() { return this.state; }
+
+    setTopic(topic) { this.topic = topic; }
+    setID(id) { this.id = id; }
+    setSocket(sock) { this.socket = sock; }
+    setState(state) { this.state = state; }
+}
+
+class DependentNode extends Node {
+    /*constuctor(topic, id, sock, state) {
+        super(topic, id, sock, state);
+    }*/
+
+    getType() { return "dependent"; }
+
+    changeState() {
+        if(this.state == 0) {
+            this.state = 1;
+        } else {
+            this.state = 0; 
+        }
+    }
+
+}
+
+class IndependentNode extends Node {
+    /*constuctor(topic, id, sock, state) {
+        super(topic, id, sock, state);
+    }*/
+
+    getType() { return "independent"; }
+
+    changeState() {
+        if(this.state == 0) {
+            this.state = 1;
+        } else {
+            this.state = 0; 
+        }
+    }
+}
+
+/*
+const DependentNode = (topic, ID, socket, state) => {
+
+    let sourceNode;
 
     const getID = () => ID;
     const getSocket = () => socket;
@@ -13,22 +65,9 @@ const DependentNode = (ID, socket, type) => {
     const changeState = () => {
         if(state == 0) {
             state = 1;
-            socket.send(
-                JSON.stringify({
-                    topic: "light",
-                    state: "${state}"
-                    })
-            );
         } else {
             state = 0;
-            socket.send(
-                JSON.stringify({
-                    topic: "light",
-                    state: "${state}"
-                    })
-            );
         }
-
     }
 
     return {
@@ -39,62 +78,29 @@ const DependentNode = (ID, socket, type) => {
         changeState
     }
 
-}
+}*/
 
-/*const Light = (ID, socket, state) => {
 
-    const lightNode = Node(ID, socket);
+/*
+const IndependentNode = (topic, ID, socket, state) => {
 
-    const changeState = () => {
-        if(state == 0) {
-            state = 1;
-            socket.send(
-                JSON.stringify({
-                    topic: "light",
-                    state: "${state}"
-                    })
-            );
-        } else {
-            state = 0;
-            socket.send(
-                JSON.stringify({
-                    topic: "light",
-                    state: "${state}"
-                    })
-            );
+    let targetNode = null;
+
+    const setTarget = (target) => {
+        let targetSet = false;
+         
+        if(targetNode = target) {
+            targetSet = true;
         }
-
-    }
-
-    return {
-        lightNode,
-        changeState,
-        setTopic
-    }
-
-} 
-*/
-
-const IndependentNode = (ID, socket, type) => {
-
-    let ID, socket, type, state, topic, targetNode;
-    
-    //const SwitchNode = Node(ID, socket);
-
-    const init = (id, sock, in_state, in_topic) => {
-        ID = id;
-        socket = sock;
-        state = in_state;
-        topic = in_topic;
-    }
-
-    const setTarget = (target) => { 
-        targetNode = target;
-        socket.send( stringify({
+        /*socket.send( stringify({
             type: "${targetNode.getType}",
             command: "message",
             message: "Independent Set"
         }));
+
+        return targetSet;
+
+
     }
 
     const setSocket = (sock) => { socket = sock }
@@ -121,13 +127,12 @@ const IndependentNode = (ID, socket, type) => {
     }
     
     return {
-        init,
         setTarget,
         setSocket,
         changeState,
     }
 
-} 
+} */
 
 
 module.exports = { IndependentNode, DependentNode };

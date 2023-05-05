@@ -1,14 +1,4 @@
-/*
-	A minimal websocket client for node.js. This client 
-	attempts to connect to a websocker server running on port
-	8080. When it connects, it listens to the command line
-	input and sends whatever text it receives there. 
-	It also prints out any incominb messages from the websocket 
-	server.
-	created 17 Jan 2021
-	modified 23 Feb 2023
-	by Tom Igoe
-*/
+
 
 const { generateInstruction, generateInitialization } = require('../sockets/topics/socket_helpers')
 
@@ -27,21 +17,22 @@ ws.on('open', function open() {
 	ws.send(JSON.stringify(
 		generateInitialization({
 			topic: "light",
-			targetID: "test_client",
+			sourceID: "test_dependent",
+            targetID: null,
 			type: "dependent",
-			isSuccess: false
+			state: 0
 		})
 	))
 
 	function sendMessage(data) {
 		data = data.trim();
 		ws.send(data);
+
+		ws.send(stringify({
+
+		}))
 	}
   stdin.on('data', sendMessage);
-	ws.send(JSON.stringify({
-		topic: 'light',
-		node: "switch"
-	}));
 });
 
 ws.on('error', function(error) {
@@ -49,5 +40,6 @@ ws.on('error', function(error) {
 });
 
 ws.on('message', function(data, flags) {
+
 	console.log('Server said: ' + data);	// print the message
 });

@@ -1,26 +1,37 @@
-const { Switch, Node, Light  } = require('./node_declerations/node.js');
+const { IndependentNode, DependentNode } = require('./node_declerations/index.js');
 
-const { generateInstruction } = require('./socket_helpers/index.js')
-
-var counter
+const { generateInstruction, generateInitialization, generateTargetSuccess } = require('./socket_helpers/index.js')
 
 const connectedLightNodes = new Set()
 
 module.exports = (wss, ws, data) => {
 
     if ( data.instruction == null) { // if data.instruction is null, it is a initiaization message
-      
+
+      let newNode = null, isInit = false;
+      if (data.type == "dependent") {
+        newNode = new DependentNode(data.topic, data.sourceID, ws, data.state);
+        isInit = true;
+      } else if (data.type == "independent") {
+        newNode = new IndependentNode(data.topic, data.sourceID, ws, data.state);
+        isInit = true;
+      }
+
+      ws.send(JSON.stringify(generateInitialization({
+        topic: newNode.getTopic(),
+        sourceID: newNode.getID(),
+        type: data.type,
+        state: newNode.getState()
+      })))
+
+      connectedLightNodes.add(newNode);
+
+      console.log('---- new light node connected ------');
+      //logs to console the connected nodes
+      console.log('Connected Nodes: ');
+
+      for(let node of connectedLightNodes)  {
+        console.log('NodeID: %s, Type: %s, State: %i',node.getID(), node.getType() ,node.getState());
+      }
     }
-
-    if ( data.node = 'switch') {
-      const newSwitch = new Switch((connectedLightNodes.size + 1), ws, data.state);
-
-      connectedLightNodes.push(newSwitch);
-    }
-
-    ws.send(JSON.stringify({ 
-      topics: 'topics worked', 
-      received: message, 
-      nodeAdded: ''
-    }));
   }

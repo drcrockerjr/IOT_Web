@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 const Topics = require('./topics')
 
 const { normalizePort, safeParseJSON, generateError } = require('../helpers')
+const { IndependentNode, DependentNode } = require('./topics/node_declerations');
 
 const connectedNodes = new Set();
 
@@ -17,7 +18,6 @@ WSS.on('listening', () => {
 
 WSS.on('connection', ws => {
 
-  //handle initialization stuff for nodes
 
   ws.on('message', message => {
     const data = safeParseJSON(message)
@@ -40,7 +40,7 @@ WSS.on('connection', ws => {
       )
     } else if (typeof data.topic === 'string' && Topics[data.topic]) {
       Topics[data.topic](WSS, ws, data); // hand socket connection and data to desired topic
-      connectedNodes.push(ws); // push new socket to connected nodes set
+      //connectedNodes.add(data.sourceID); // push new socket to connected nodes set
     } else {
       ws.send(
         JSON.stringify(
