@@ -19,11 +19,26 @@ class Node {
     setSocket(sock) { this.socket = sock; }
     setState(state) { this.state = state; }
     setTarget(node) { this.targetNode = node; }
+
 }
 
 class DependentNode extends Node {
 
+    constructor(topic, id, sock, state, type) {
+        super(topic, id, sock, state);
+        
+        this.type = "dependent";
+    }
+    
     getType() { return "dependent"; }
+
+    handleCommand(command) {
+        if(command == 'change-state') {
+            this.changeState();
+        } else {
+            console.log(`${this.id} couldnt resolve command: ${command}`)
+        }
+    }
 
     changeState() {
         if(this.state == 0) {
@@ -33,9 +48,25 @@ class DependentNode extends Node {
         }
     }
 
+    printNode() { 
+       console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i', 
+        this.id, 
+        ((this.targetNode != null) ? this.targetNode.getID() : null), 
+        this.type, 
+        this.state);
+
+    }
+
 }
 
 class IndependentNode extends Node {
+
+    constructor(topic, id, sock, state, targetNode) {
+        super(topic, id, sock, state);
+        
+        this.type = "dependent";
+        this.targetNode = targetNode;
+    }
 
     getType() { return "independent"; }
 
@@ -45,6 +76,14 @@ class IndependentNode extends Node {
         } else {
             this.state = 0; 
         }
+    }
+
+    printNode() { 
+        console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',
+        this.id, 
+        ((this.targetNode != null) ? this.targetNode.getID() : null), 
+        this.type,
+        this.state);
     }
 }
 

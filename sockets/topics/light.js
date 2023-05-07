@@ -19,11 +19,7 @@ module.exports = (wss, ws, data, connectedNodes) => { // this blcok is for new n
       console.log('Connected Nodes: ');
 
       for(let node of connectedNodes)  {
-        console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',
-        node.getID(), 
-        ((node.getTarget() != null) ? node.getTarget().getID() : null), 
-        node.getType(), 
-        node.getState());
+        node.printNode();
       }
     } else if (data.instructions != null) {
 

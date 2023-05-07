@@ -25,7 +25,7 @@ const generateInstruction = ({ topic, targetID, sourceID, instruction = [] }) =>
         topic: topic,
         targetID: targetID,
         sourceID: sourceID, 
-        instructions: instruction.map(({ targetID, targetType, command, auxilery }) => {
+        instructions: instruction.map(({ targetType, command, auxilery }) => {
             return {
                 targetType,
                 command,

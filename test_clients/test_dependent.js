@@ -51,6 +51,12 @@ ws.on('message', function(message, flags) {
 
 	if ( data.instructions != null) {
 		console.log('%s said: %o', data.sourceID, data.instructions);	// print the message
+
+		if( data["instructions"][0].command == 'change_state') {
+			state = 1;
+			console.log('state changed');
+		}
+
 	} else if (data.instructions == null){ //means it was an init
 		console.log('Server said: %o',data );
 	}

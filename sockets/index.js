@@ -20,6 +20,8 @@ WSS.on('listening', () => {
 
 WSS.on('connection', ws => {
 
+  const start = Date.now();
+
 
   ws.on('message', message => {
     const data = safeParseJSON(message)
@@ -44,7 +46,7 @@ WSS.on('connection', ws => {
       )
     } else if (typeof data.topic === 'string' && Topics[data.topic]) {
       
-      if(data.instructions == null) {
+      if(data.instructions == null) { // initializes node if the message isnt an instruction
         let newNode = null, isInit = false;
         if (data.type == "dependent") {
           newNode = new DependentNode(data.topic, data.sourceID, ws, data.state);
@@ -91,6 +93,13 @@ WSS.on('connection', ws => {
         )
       )
     }
+  });
+
+  ws.on('close', message => {
+
+    const end = Date.now();
+
+    console.log(`node disconnected after: ${end - start} milli-seconds`);
   });
 
 
