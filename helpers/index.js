@@ -18,6 +18,7 @@ module.exports.safeParseJSON = message => {
   try {
     return JSON.parse(message)
   } catch (error) {
+    console.log('Parse Error: ' + error);
     return null
   }
 }

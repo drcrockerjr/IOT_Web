@@ -1,8 +1,14 @@
 
 
-const { generateInstruction, generateInitialization } = require('../sockets/topics/socket_helpers')
+const { safeParseJSON } = require('../helpers');
+const { generateInitialization } = require('../sockets/topics/socket_helpers')
 
 let isInit = false;
+
+const topic = "light";
+const ID = "test_dependent";
+const type = "dependent"
+let state = 0;
 
 var WebSocket = require('ws');
 var stdin = process.openStdin();	// enable input from the keyboard
@@ -16,11 +22,11 @@ ws.on('open', function open() {
 
 	ws.send(JSON.stringify(
 		generateInitialization({
-			topic: "light",
-			sourceID: "test_dependent",
+			topic: topic,
+			sourceID: ID,
             targetID: null,
-			type: "dependent",
-			state: 0
+			type: type,
+			state: state
 		})
 	))
 
@@ -28,9 +34,9 @@ ws.on('open', function open() {
 		data = data.trim();
 		ws.send(data);
 
-		ws.send(stringify({
-
-		}))
+		ws.send(stringify(
+			
+		))
 	}
   stdin.on('data', sendMessage);
 });
@@ -39,7 +45,14 @@ ws.on('error', function(error) {
 	console.log(error);
 });
 
-ws.on('message', function(data, flags) {
+ws.on('message', function(message, flags) {
 
-	console.log('Server said: ' + data);	// print the message
+	const data = safeParseJSON(message);
+
+	if ( data.instructions != null) {
+		console.log('%s said: %o', data.sourceID, data.instructions);	// print the message
+	} else if (data.instructions == null){ //means it was an init
+		console.log('Server said: %o',data );
+	}
+
 });

@@ -5,13 +5,14 @@ class Node {
         this.id = id;
         this.socket = sock;
         this.state = state;
+        this.targetNode = null;
     }
 
     getTopic() { return this.topic; }
     getID() { return this.id; }
     getSocket() { return this.socket; }
     getState() { return this.state; }
-    getTarget() { return this.targetNode; }
+    getTarget() { return (this.targetNode != null) ? null : this.targetNode; }
 
     setTopic(topic) { this.topic = topic; }
     setID(id) { this.id = id; }
@@ -21,9 +22,6 @@ class Node {
 }
 
 class DependentNode extends Node {
-    /*constuctor(topic, id, sock, state) {
-        super(topic, id, sock, state);
-    }*/
 
     getType() { return "dependent"; }
 
@@ -38,10 +36,6 @@ class DependentNode extends Node {
 }
 
 class IndependentNode extends Node {
-    /*constuctor(topic, id, sock, state) {
-        super(topic, id, sock, state);
-    }*/
-
 
     getType() { return "independent"; }
 
@@ -53,89 +47,5 @@ class IndependentNode extends Node {
         }
     }
 }
-
-/*
-const DependentNode = (topic, ID, socket, state) => {
-
-    let sourceNode;
-
-    const getID = () => ID;
-    const getSocket = () => socket;
-    const getType = () => type;
-
-    const setTopic = (inTopic) => { topic = inTopic };
-
-    const changeState = () => {
-        if(state == 0) {
-            state = 1;
-        } else {
-            state = 0;
-        }
-    }
-
-    return {
-        getID,
-        getSocket,
-        getType,
-        setTopic,
-        changeState
-    }
-
-}*/
-
-
-/*
-const IndependentNode = (topic, ID, socket, state) => {
-
-    let targetNode = null;
-
-    const setTarget = (target) => {
-        let targetSet = false;
-         
-        if(targetNode = target) {
-            targetSet = true;
-        }
-        /*socket.send( stringify({
-            type: "${targetNode.getType}",
-            command: "message",
-            message: "Independent Set"
-        }));
-
-        return targetSet;
-
-
-    }
-
-    const setSocket = (sock) => { socket = sock }
-
-    const changeState = () => {
-        if(state == 0) {
-            state = 1;
-            targetSocket.send(
-                JSON.stringify({
-                    command: "change_state",
-                    state: "${state}"
-                    })
-            );
-        } else {
-            state = 0;
-            targetSocket.send(
-                JSON.stringify({
-                    command: "change_state",
-                    state: "${state}"
-                    })
-            );
-        }
-
-    }
-    
-    return {
-        setTarget,
-        setSocket,
-        changeState,
-    }
-
-} */
-
 
 module.exports = { IndependentNode, DependentNode };

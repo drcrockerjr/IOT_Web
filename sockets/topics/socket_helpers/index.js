@@ -1,18 +1,18 @@
 /**
  * @typedef Instruction
  * @type {Object}
- * @param {string} type - The the type of node the command is targeting
+ * @param {string} targetType - The the type of node the command is targeting, will be used when sensors are added
  * @param {string} command - The command = [changeState, will add more]
- * @param {any} data - Auxilery data that accompanies the command
- * @param {string} location - The location of the error reason.
+ * @param {any} auxilery - Auxilery data that accompanies the command
  */
 
 /**
  * @typedef InstructionMessage
  * @type {Object}
  * @param {string} topic - The topic the Instruction was sent from.
- * @param {string} targetID - the ID of the target node
- * @param {Array.<Instruction>} instructions - The reasons for the error.
+ * @param {string} targetID - The ID of the node intruction is targeting
+ * @param {string} sourceID - the ID of the node sending command
+ * @param {Array.<Instruction>} instruction - The reasons for the error.
  */
 
 /**
@@ -20,17 +20,17 @@
  * @return The rendered Instruction message to be sent
  */
 
-const generateInstruction = ({ topic, targetID, instructions = [] }) => {
+const generateInstruction = ({ topic, targetID, sourceID, instruction = [] }) => {
     return {
         topic: topic,
-        targetID: targetID, 
-        instruction: instructions.map(({ type, command, data, location}) => {
-        return {
-            type,
-            command,
-            data: data || null,
-            loacation: location || null
-        }
+        targetID: targetID,
+        sourceID: sourceID, 
+        instructions: instruction.map(({ targetID, targetType, command, auxilery }) => {
+            return {
+                targetType,
+                command,
+                auxilery
+            }
         })
     }
 }
@@ -82,17 +82,17 @@ const generateTargetSuccess = (({ topic, sourceID, targetID}) => {
 })
 
 
-const handleTarget = (nodes, newNode, message) => {
+/*const handleTarget = (nodes, newNode, message) => {
     for (let node of nodes) {
         if (message.targetID == node.getID()) {
             newNode.setTarget(node);
         }
     }
-}
+}*/
+
 
 module.exports = { 
     generateInstruction, 
     generateInitialization, 
     generateTargetSuccess, 
-    handleTarget 
 }
