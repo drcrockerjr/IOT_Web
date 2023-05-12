@@ -1,3 +1,4 @@
 module.exports = {
-  example: require('./example')
+  light: require('./Light'),
+  irrigation: require('./Irrigation')
 }

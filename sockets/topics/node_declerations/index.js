@@ -24,9 +24,9 @@ class Node {
 
 class DependentNode extends Node {
 
-    constructor(topic, id, sock, state, type) {
+    constructor(topic, id, sock, state) {
         super(topic, id, sock, state);
-        
+
         this.type = "dependent";
     }
     
@@ -61,11 +61,11 @@ class DependentNode extends Node {
 
 class IndependentNode extends Node {
 
-    constructor(topic, id, sock, state, targetNode) {
+    constructor(topic, id, sock, state) {
         super(topic, id, sock, state);
         
         this.type = "dependent";
-        this.targetNode = targetNode;
+        this.targetNode = null;
     }
 
     getType() { return "independent"; }

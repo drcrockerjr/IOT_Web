@@ -1,11 +1,11 @@
 const WebSocket = require('ws')
 const Topics = require('./topics')
 
-const { normalizePort, safeParseJSON, generateError } = require('../helpers')
+const { normalizePort, safeParseJSON, generateError, generateInitialization, generateTargetSuccess } = require('../helpers');
 
 const { IndependentNode, DependentNode } = require('./topics/node_declerations');
-const { generateInstruction, generateInitialization, generateTargetSuccess } = require('./topics/socket_helpers')
 
+//stores connected socket nodes
 const connectedNodes = new Set();
 
 const WSS = new WebSocket.Server({
@@ -20,8 +20,7 @@ WSS.on('listening', () => {
 
 WSS.on('connection', ws => {
 
-  const start = Date.now();
-
+  const start = Date.now(); //delete after done using to test
 
   ws.on('message', message => {
     const data = safeParseJSON(message)
@@ -49,7 +48,7 @@ WSS.on('connection', ws => {
       if(data.instructions == null) { // initializes node if the message isnt an instruction
         let newNode = null, isInit = false;
         if (data.type == "dependent") {
-          newNode = new DependentNode(data.topic, data.sourceID, ws, data.state);
+          newNode = new DependentNode(data.topic, data.sourceID, ws, data.state, data.type);
           isInit = true;
         } else if (data.type == "independent") {
           newNode = new IndependentNode(data.topic, data.sourceID, ws, data.state);
@@ -58,12 +57,20 @@ WSS.on('connection', ws => {
             if(data.targetID == n.getID()) {
               newNode.setTarget(n);
               console.log('target ID of %s set to : %s',data.sourceID, n.getID());
+
+              ws.send(JSON.stringify( 
+                generateTargetSuccess({
+                  topic: newNode.getTopic(),
+                  sourceID: newNode.getID(),
+                  targetID: newNode.getTarget()
+              })))
             }
           }
           isInit = true;
         }
 
-        ws.send(JSON.stringify(generateInitialization({ // for testing purposes
+        ws.send(JSON.stringify(
+          generateInitialization({ // for testing purposes
           topic: newNode.getTopic(),
           sourceID: newNode.getID(),
           targetID: newNode.getTarget(),
@@ -97,10 +104,23 @@ WSS.on('connection', ws => {
 
   ws.on('close', message => {
 
-    const end = Date.now();
+    const end = Date.now(); //delete after done using to test
 
-    console.log(`node disconnected after: ${end - start} milli-seconds`);
+    console.log(`console close message: ${message}`);
+
+    for (let n of connectedNodes) { 
+      if(ws == n.getSocket()) {
+        connectedNodes.delete(n);
+        console.log(`${n.getID()} disconnected from the server`);
+        console.log(`${n.getID()} disconnected after: ${end - start} milli-seconds`);
+      }
+    }
+    console.log('New Connected Nodes: ');
+
+    for(let node of connectedNodes)  {
+      node.printNode();
+    }
+
   });
-
 
 })

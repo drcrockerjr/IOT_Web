@@ -1,2 +1,2 @@
-require('./sockets')
-require('./web')
+require('./sockets');
+require('./web');
