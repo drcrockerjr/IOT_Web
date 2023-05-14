@@ -1,4 +1,4 @@
 module.exports = {
-  light: require('./Light'),
-  irrigation: require('./Irrigation')
+  light: require('./Light/index.js'),
+  irrigation: require('./Irrigation/index.js')
 }

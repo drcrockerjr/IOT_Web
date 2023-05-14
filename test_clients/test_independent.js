@@ -1,7 +1,6 @@
 
 
-const { safeParseJSON } = require('../helpers');
-const { generateInstruction, generateInitialization } = require('../sockets/topics/socket_helpers')
+const { safeParseJSON, generateInstruction, generateInitialization } = require('../helpers');
 
 let isInit = false;
 
@@ -18,8 +17,6 @@ stdin.setEncoding('utf8');			  // encode everything typed as a string
 var ws = new WebSocket('ws://localhost:8080/');
 
 ws.on('open', function open() {
-	// this function runs if there's input from the keyboard.
-	// you need to hit enter to generate this event.
 
 	ws.send(JSON.stringify(
 		generateInitialization({
@@ -29,27 +26,8 @@ ws.on('open', function open() {
 			type: type,
 			state: state
 		})
-	))
+	));
 
-	function sendMessage(data) {
-
-		ws.send(
-			JSON.stringify(
-				generateInstruction({
-					topic: topic,
-					targetID: 'test_dependent', 
-					sourceID: ID,
-					instruction: [
-						{
-							targetType: 'dependent',
-							command: 'change_state',
-							auxilery: 'null'
-						}
-					]
-				})
-			)
-		)
-	}
   stdin.on('data', sendMessage);
 });
 
@@ -66,3 +44,23 @@ ws.on('message', function(data, flags) {
 	console.log('Server said: %o', message);	// print the message
 
 });
+
+function sendMessage(data) {
+
+	ws.send(
+		JSON.stringify(
+			generateInstruction({
+				topic: topic,
+				targetID: 'test_dependent', 
+				sourceID: ID,
+				instruction: [
+					{
+						targetType: 'dependent',
+						command: 'change_state',
+						auxilery: 'null'
+					}
+				]
+			})
+		)
+	)
+}
