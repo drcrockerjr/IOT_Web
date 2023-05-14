@@ -1,6 +1,6 @@
 
 
-const { safeParseJSON, generateInstruction, generateInitialization } = require('../helpers');
+const { safeParseJSON, generateInstruction, generateInitialization } = require('../src/helpers');
 
 let isInit = false;
 
@@ -16,9 +16,20 @@ stdin.setEncoding('utf8');			  // encode everything typed as a string
 
 var ws = new WebSocket('ws://localhost:8080/');
 
+
 ws.on('open', function open() {
 
 	ws.send(JSON.stringify(
+		generateInitialization({
+			topic: topic,
+			sourceID: ID,
+            targetID: target,
+			type: type,
+			state: state
+		})
+	));
+
+	console.log(JSON.stringify(
 		generateInitialization({
 			topic: topic,
 			sourceID: ID,
@@ -63,4 +74,21 @@ function sendMessage(data) {
 			})
 		)
 	)
+
+	console.log(
+		JSON.stringify(
+			generateInstruction({
+				topic: topic,
+				targetID: 'test_dependent', 
+				sourceID: ID,
+				instruction: [
+					{
+						targetType: 'dependent',
+						command: 'change_state',
+						auxilery: 'null'
+					}
+				]
+			})
+		)
+	);
 }

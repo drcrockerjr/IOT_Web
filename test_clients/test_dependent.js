@@ -1,7 +1,6 @@
 
 
-const { safeParseJSON } = require('../helpers');
-const { generateInitialization } = require('../sockets/topics/socket_helpers')
+const { safeParseJSON,generateInitialization } = require('../src/helpers');
 
 let isInit = false;
 

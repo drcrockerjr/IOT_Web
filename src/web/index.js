@@ -1,12 +1,15 @@
-const express = require('express')
-const app = express()
-const routes = require('./routes')
+const express = require('express');
+const app = express();
+const path = require('path');
+const routes = require('./routes');
 
-const { generateError } = require('../helpers')
+const { generateError } = require('../helpers');
 
 Object.keys(routes).forEach(key => {
   app.use(`/${key}`, routes[key])
 })
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res) => {
   return res.status(404).json(
