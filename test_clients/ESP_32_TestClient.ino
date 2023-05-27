@@ -17,9 +17,13 @@
 */
 
 #include <ArduinoJson.h>
+#include <Arduino.h>
 
-#include <ArduinoWebsockets.h>
 #include <WiFi.h>
+#include <WiFiMulti.h>
+#include <WiFiClientSecure.h>
+
+#include <WebSocketsClient.h>
 
 const char* ssid = "2.4 875 NW Calliope Unit 104"; //Enter SSID
 const char* password = "CXNK00597744"; //Enter Password
@@ -27,8 +31,7 @@ const char* websockets_server_host = "192.168.10.50"; //Enter server adress
 const uint16_t websockets_server_port = 8080; // Enter server port
 
 const int pin_1 = 4;
-
-using namespace websockets;
+const int pin_2 = 16;
 
 DynamicJsonDocument doc(2048);
 
@@ -37,7 +40,7 @@ void handleInstruction() {
 }
 
 
-char**  getInstruction(String payload) {
+/*char**  getInstruction(String payload) {
 
   const char* data = payload.c_str();
 
@@ -46,63 +49,123 @@ char**  getInstruction(String payload) {
     Serial.print(F("deserializeJson() failed: "));
     Serial.println(error.c_str());
     return NULL;
-  }*/
+  }
 
   const String source_id = doc["sourceID"];
 
-  char** instruction = doc["instructions"];
+  const char** instruction = doc["instructions"];
 
   Serial.print(F("Instrucitons: "));
   Serial.printf("targetType: %s, command: %s, pin: %s \n ", instruction[0], instruction[1], instruction[2]);
 
   return instruction;
+}*/
+
+WiFiMulti WiFiMulti;
+WebSocketsClient webSocket;
+
+#define USE_SERIAL Serial1
+
+const char* json = "{\"topic\":\"topic\",\"sourceID\":\"sourceID\",\"targetID\":"NULL",\"type\":\"type\",\"state\":\"state\"}";
+
+/*
+JsonObject& root = jsonBuffer.parseObject(json);
+
+const char* topic = root["topic"]; // "topic"
+const char* sourceID = root["sourceID"]; // "sourceID"
+const char* type = root["type"]; // "type"
+const char* state = root["state"]; // "state"
+*/
+
+
+
+
+void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
+	const uint8_t* src = (const uint8_t*) mem;
+	USE_SERIAL.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+	for(uint32_t i = 0; i < len; i++) {
+		if(i % cols == 0) {
+			USE_SERIAL.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+		}
+		USE_SERIAL.printf("%02X ", *src);
+		src++;
+	}
+	USE_SERIAL.printf("\n");
 }
 
-void onMessageCallback(WebsocketsMessage message) {
-    Serial.print("Got Message: ");
-    Serial.println(message.data());
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+
+	switch(type) {
+		case WStype_DISCONNECTED:
+			USE_SERIAL.printf("[WSc] Disconnected!\n");
+			break;
+		case WStype_CONNECTED:
+			USE_SERIAL.printf("[WSc] Connected to url: %s\n", payload);
+
+			// send message to server when Connected
+			webSocket.sendTXT("Connected");
+			break;
+		case WStype_TEXT:
+			USE_SERIAL.printf("[WSc] get text: %s\n", payload);
+
+			// send message to server
+			// webSocket.sendTXT("message here");
+			break;
+		case WStype_BIN:
+			USE_SERIAL.printf("[WSc] get binary length: %u\n", length);
+			hexdump(payload, length);
+
+			// send data to server
+			// webSocket.sendBIN(payload, length);
+			break;
+		case WStype_ERROR:			
+		case WStype_FRAGMENT_TEXT_START:
+		case WStype_FRAGMENT_BIN_START:
+		case WStype_FRAGMENT:
+		case WStype_FRAGMENT_FIN:
+			break;
+	}
+
 }
 
-void onEventsCallback(WebsocketsEvent event, String data) {
-    if(event == WebsocketsEvent::ConnectionOpened) {
-        Serial.println("Connnection Opened");
-    } else if(event == WebsocketsEvent::ConnectionClosed) {
-        Serial.println("Connnection Closed");
-    } else if(event == WebsocketsEvent::GotPing) {
-        Serial.println("Got a Ping!");
-    } else if(event == WebsocketsEvent::GotPong) {
-        Serial.println("Got a Pong!");
-    }
-}
-
-WebsocketsClient client;
 void setup() {
-    Serial.begin(115200);
-    // Connect to wifi
-    WiFi.begin(ssid, password);
+	// USE_SERIAL.begin(921600);
+	USE_SERIAL.begin(115200);
 
-    // Wait some time to connect to wifi
-    for(int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
-        Serial.print(".");
-        delay(1000);
-    }
+	//Serial.setDebugOutput(true);
+	USE_SERIAL.setDebugOutput(true);
 
-    // run callback when messages are received
-    client.onMessage(onMessageCallback);
-    
-    // run callback when events are occuring
-    client.onEvent(onEventsCallback);
+	USE_SERIAL.println();
+	USE_SERIAL.println();
+	USE_SERIAL.println();
 
-    // Connect to server
-    client.connect(websockets_server_host, websockets_server_port, "/");
+	for(uint8_t t = 4; t > 0; t--) {
+		USE_SERIAL.printf("[SETUP] BOOT WAIT %d...\n", t);
+		USE_SERIAL.flush();
+		delay(1000);
+	}
 
-    // Send a message
-    client.send("Hello Server");
+	WiFiMulti.addAP(ssid, password);
 
-    // Send a ping
-    client.ping();
+	//WiFi.disconnect();
+	while(WiFiMulti.run() != WL_CONNECTED) {
+		delay(100);
+	}
+
+	// server address, port and URL
+	webSocket.begin(websockets_server_host, websockets_server_port, "/");
+
+	// event handler
+	webSocket.onEvent(webSocketEvent);
+
+	// use HTTP Basic Authorization this is optional remove if not needed
+	//webSocket.setAuthorization("user", "Password");
+
+	// try ever 5000 again if connection has failed
+	webSocket.setReconnectInterval(5000);
+
 }
 
 void loop() {
-    client.poll();
+	webSocket.loop();
 }
