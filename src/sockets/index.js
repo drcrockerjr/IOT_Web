@@ -27,7 +27,7 @@ const runSocketServer = (connectedNodes) => {
     ws.on('message', message => {
       const data = safeParseJSON(message)
 
-    console.log(data);
+      console.log('\nData Recieved: \n %o', data);
 
       if (data === null) {
         ws.send(
@@ -60,7 +60,8 @@ const runSocketServer = (connectedNodes) => {
             for (let n of connectedNodes) { 
               if(data.targetID == n.getID()) {
                 newNode.setTarget(n);
-                console.log('target ID of %s set to : %s',newNode.getID(), newNode);
+                console.log('\ntarget ID of %s set to : %s',newNode.getID(), newNode);
+		console.log(`\nTarget ID of ${newNode.getID()} set to => ${newNode.getTarget().getID()}`);
 
                 ws.send(JSON.stringify( 
                   generateTargetSuccess({
@@ -117,16 +118,22 @@ const runSocketServer = (connectedNodes) => {
       for (let n of connectedNodes) { 
         if(ws == n.getSocket()) {
           connectedNodes.delete(n);
-          console.log(`${n.getID()} disconnected from the server`);
-          console.log(`${n.getID()} disconnected after: ${end - start} milli-seconds`);
+
+
+    	  console.log(`\n---- ${n.getID()} node disconnected ------\n`);
+
+          console.log(`${n.getID()} disconnected after: ${end - start} milli-seconds\n`);
+    	  
+	  //logs to console the connected nodes
+    	  console.log('Connected Nodes: ');
+
+    	  for(let node of connectedNodes)  {
+      	    node.printNode();
+    	  }
+	  
+    	  console.log('\n');
         }
       }
-      console.log('New Connected Nodes: ');
-
-      for(let node of connectedNodes)  {
-        node.printNode();
-      }
-
     });
 
   })

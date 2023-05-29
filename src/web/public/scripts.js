@@ -49,7 +49,7 @@ window.onload = function() {
 
 	btnConnect.addEventListener("click", connectSocket);
 
-	btn.addEventListener("click", changeState);
+	btnChange.addEventListener("click", changeState);
 
 	btnClose.addEventListener("click", closeSocket);
 
@@ -94,7 +94,7 @@ function connectSocket() {
 
 function changeState() {
 
-	instruction.targetID = target_text.value;
+	instruction.targetID = target_txt.value;
 
 	socket.send(JSON.stringify(instruction));
 

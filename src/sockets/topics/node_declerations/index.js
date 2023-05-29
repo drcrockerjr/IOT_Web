@@ -20,6 +20,15 @@ class Node {
     setState(state) { this.state = state; }
     setTarget(node) { this.targetNode = node; }
 
+
+    printNode() { 
+        console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',
+        this.id, 
+        (this.targetNode == null) ? null : this.targetNode.getID(), 
+        this.type,
+        this.state);
+    }
+
 }
 
 class DependentNode extends Node {
@@ -48,15 +57,6 @@ class DependentNode extends Node {
         }
     }
 
-    printNode() { 
-       console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i', 
-        this.id, 
-        ((this.targetNode != null) ? this.targetNode.getID() : null), 
-        this.type, 
-        this.state);
-
-    }
-
 }
 
 class IndependentNode extends Node {
@@ -76,14 +76,6 @@ class IndependentNode extends Node {
         } else {
             this.state = 0; 
         }
-    }
-
-    printNode() { 
-        console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',
-        this.id, 
-        (this.targetNode == null) ? null : this.targetNode, 
-        this.type,
-        this.state);
     }
 }
 
