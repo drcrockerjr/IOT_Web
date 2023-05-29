@@ -12,7 +12,7 @@ class Node {
     getID() { return this.id; }
     getSocket() { return this.socket; }
     getState() { return this.state; }
-    getTarget() { return (this.targetNode != null) ? null : this.targetNode; }
+    getTarget() { return (this.targetNode == null) ? null : this.targetNode; }
 
     setTopic(topic) { this.topic = topic; }
     setID(id) { this.id = id; }
@@ -64,7 +64,7 @@ class IndependentNode extends Node {
     constructor(topic, id, sock, state) {
         super(topic, id, sock, state);
         
-        this.type = "dependent";
+        this.type = "independent";
         this.targetNode = null;
     }
 

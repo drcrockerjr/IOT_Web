@@ -50,15 +50,17 @@ const runSocketServer = (connectedNodes) => {
         if(data.instructions == null) { // initializes node if the message isnt an instruction
           let newNode = null, isInit = false;
           if (data.type == "dependent") {
-            newNode = new DependentNode(data.topic, data.sourceID, ws, data.state, data.type);
+            newNode = new DependentNode(data.topic, data.sourceID, ws, data.state);
             isInit = true;
           } else if (data.type == "independent") {
+
+            //independent node created and target is set
             newNode = new IndependentNode(data.topic, data.sourceID, ws, data.state);
 
             for (let n of connectedNodes) { 
               if(data.targetID == n.getID()) {
                 newNode.setTarget(n);
-                console.log('target ID of %s set to : %s',data.sourceID, n.getID());
+                console.log('target ID of %s set to : %s',newNode.getID(), newNode);
 
                 ws.send(JSON.stringify( 
                   generateTargetSuccess({
@@ -67,8 +69,10 @@ const runSocketServer = (connectedNodes) => {
                     targetID: newNode.getTarget()
                 })))
               }
-            }
+            
             isInit = true;
+            }
+
           }
 
           ws.send(JSON.stringify(

@@ -66,7 +66,7 @@ function connectSocket() {
 		socketStatus.className = 'open';
 	
 		init.topic = topic_txt.value;
-		init.targetID = target
+		init.targetID = target_text;
 
 		console.log(init); // testing
 	
@@ -94,6 +94,8 @@ function connectSocket() {
 
 function changeState() {
 
+	instruction.targetID = target_text;
+
 	socket.send(JSON.stringify(instruction));
 
 }	
@@ -101,6 +103,6 @@ function changeState() {
 function closeSocket() {
 
 	socket.close();
-	
+
 }
 
