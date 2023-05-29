@@ -18,6 +18,9 @@ module.exports = (wss, ws, data, connectedNodes) => { // this blcok is for new n
     //finds desired target node [ need to make its own function ]
     for (let n of connectedNodes) { 
       if(data.targetID == n.getID()) {
+
+          console.log('data routed:  %s ===> %s', n.getID(), data.targetID);
+
           const targetSock = n.getSocket()
           targetSock.send(JSON.stringify(data));
       }
