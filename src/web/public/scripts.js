@@ -94,7 +94,7 @@ function connectSocket() {
 
 function changeState() {
 
-	instruction.targetID = target_text;
+	instruction.targetID = target_text.value;
 
 	socket.send(JSON.stringify(instruction));
 
