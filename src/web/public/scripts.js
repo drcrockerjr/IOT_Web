@@ -64,7 +64,6 @@ window.onload = function() {
 
 	socket.onclose = function(event) {
 		socketStatus.innerHTML = 'Disconnected from the WebSocket.';
-		socketStatus.className = 'closed';
 	};
 
 	socket.onmessage = function(event) {
