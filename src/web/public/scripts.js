@@ -33,24 +33,40 @@ var instruction = {
 }
 
 window.onload = function() {
-	btn = document.getElementById('change-state');
+
+	btnConnect = document.getElementById('connect');
+	btnChange = document.getElementById('change-state');
+	btnClose = document.getElementById('close-socket');
+
+
 	topic_txt = document.getElementById('topic-text');
+	target_txt = document.getElementById('target-text');
+
 	socketStatus = document.getElementById('status');
 	listMsgs = document.getElementById('messages');
 
 
 
-
-	socket = new WebSocket('ws://192.168.10.50:8080/');
+	btnConnect.addEventListener("click", connectSocket);
 
 	btn.addEventListener("click", changeState);
 
+	btnClose.addEventListener("click", closeSocket);
+
+
+
+}
+
+function connectSocket() {
+
+	socket = new WebSocket('ws://192.168.10.50:8080/');
 
 	socket.onopen = function(event) {
 		socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.URL;
 		socketStatus.className = 'open';
 	
 		init.topic = topic_txt.value;
+		init.targetID = target
 
 		console.log(init); // testing
 	
@@ -64,6 +80,9 @@ window.onload = function() {
 
 	socket.onclose = function(event) {
 		socketStatus.innerHTML = 'Disconnected from the WebSocket.';
+
+		socketStatus.innerHTML = 'Disconnected from: ' + event.currentTarget.URL;
+		socketStatus.className = 'closed';
 	};
 
 	socket.onmessage = function(event) {
@@ -73,12 +92,15 @@ window.onload = function() {
 
 }
 
-
 function changeState() {
 
 	socket.send(JSON.stringify(instruction));
 
-	socket.close();
-
 }	
+
+function closeSocket() {
+
+	socket.close();
+	
+}
 
