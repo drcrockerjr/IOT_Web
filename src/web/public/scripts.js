@@ -66,7 +66,7 @@ function connectSocket() {
 		socketStatus.className = 'open';
 	
 		init.topic = topic_txt.value;
-		init.targetID = target_text.value;
+		init.targetID = target_txt.value;
 
 		console.log(init); // testing
 	

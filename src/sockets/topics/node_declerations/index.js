@@ -81,7 +81,7 @@ class IndependentNode extends Node {
     printNode() { 
         console.log('NodeID: %s, TargetID: %s, Type: %s, State: %i',
         this.id, 
-        ((this.targetNode != null) ? this.targetNode.getID() : null), 
+        (this.targetNode == null) ? null : this.targetNode, 
         this.type,
         this.state);
     }
