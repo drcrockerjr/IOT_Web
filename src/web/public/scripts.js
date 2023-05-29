@@ -38,7 +38,10 @@ window.onload = function() {
 	socketStatus = document.getElementById('status');
 	listMsgs = document.getElementById('messages');
 
-	socket = new WebSocket('ws://localhost:8080/');
+
+
+
+	socket = new WebSocket('ws://192.168.10.50:8080/');
 
 	btn.addEventListener("click", changeState);
 
