@@ -64,11 +64,11 @@ const runSocketServer = (connectedNodes) => {
 		console.log(`\nTarget ID of ${newNode.getID()} set to => ${newNode.getTarget().getID()}`);
 
                 ws.send(JSON.stringify( 
-                  generateTargetSuccess({
-                    topic: newNode.getTopic(),
-                    sourceID: newNode.getID(),
-                    targetID: newNode.getTarget()
-                })))
+                  [{
+                    targetType: newNode.getType(),
+                    command: 'initialized',
+                    auxilery: 0
+                }]))
               }
             
             isInit = true;
@@ -76,14 +76,14 @@ const runSocketServer = (connectedNodes) => {
 
           }
 
-          ws.send(JSON.stringify(
+          /*ws.send(JSON.stringify(
             generateInitialization({ // for testing purposes
             topic: newNode.getTopic(),
             sourceID: newNode.getID(),
             targetID: newNode.getTarget(),
             type: data.type,
             state: newNode.getState()
-          })))
+          })))*/
 
           connectedNodes.add(newNode);
         }

@@ -19,7 +19,7 @@ var init = {
 
 }
 
-var instruction = {
+var instruct = {
 	topic: 'light',
 	targetID: target,
 	sourceID: ID,
@@ -27,7 +27,7 @@ var instruction = {
 	  {
 		targetType: 'dependent',
 		command: 'change_state',
-		auxilery: 'null'
+		auxilery: 4
 	  }
 	]
 }
@@ -65,6 +65,7 @@ function connectSocket() {
 		socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.URL;
 		socketStatus.className = 'open';
 	
+		
 		init.topic = topic_txt.value;
 		init.targetID = target_txt.value;
 
@@ -94,9 +95,11 @@ function connectSocket() {
 
 function changeState() {
 
-	instruction.targetID = target_txt.value;
 
-	socket.send(JSON.stringify(instruction));
+	instruct.topic = topic_txt.value;
+	instruct.targetID = target_txt.value;
+
+	socket.send(JSON.stringify(instruct));
 
 }	
 
