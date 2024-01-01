@@ -59,7 +59,8 @@ window.onload = function() {
 
 function connectSocket() {
 
-	socket = new WebSocket('ws://192.168.10.50:8080/');
+	//socket = new WebSocket('ws://192.168.10.50:8080/');
+	socket = new WebSocket('ws://localhost:8080/');
 
 	socket.onopen = function(event) {
 		socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.URL;

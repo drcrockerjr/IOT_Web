@@ -3,7 +3,7 @@ const app = express();
 const path = require('path');
 const routes = require('./routes');
 
-const { generateError } = require('../helpers');
+const { generateError } = require('../instructions');
 
 const runWebServer = (connectedNodes) => {
 

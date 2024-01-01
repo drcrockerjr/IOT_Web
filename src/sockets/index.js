@@ -1,30 +1,40 @@
-const WebSocket = require('ws')
-const Topics = require('./topics')
+//const WebSocket = require('ws')
+//const NestIDs = require('./NestIDs')
+const { Server } = require("socket.io");
+const io = new Server(8080);
 
-const { normalizePort, safeParseJSON, generateError, generateInitialization, generateTargetSuccess } = require('../helpers');
 
-const { IndependentNode, DependentNode } = require('./topics/node_declerations');
+const { Nest, routeIntructions, returnElementFromNests } = require('./nest.js');
+
+const { safeParseJSON, generateError, InitHandshake, generateTargetSuccess } = require('../instructions.js');
+
+const { Element, Controller } = require('./element.js');
 
 //stores connected socket nodes
 //const connectedNodes = new Set();
 
-const runSocketServer = (connectedNodes) => {
+/*
+var cron = require('node-cron');
+  
+cron.schedule('* * * * *', () => {
+  console.log('running a task every minute');
+});
+\
+use for ping/pong frame on a timer to check when connections close out or not
 
-  const WSS = new WebSocket.Server({
-    port: normalizePort(process.env.SOCKET_PORT || 8080)
-  })
+*/
 
-  WSS.on('listening', () => {
-    console.log(
-      `WebSocket Server is now listening on PORT: ${WSS.address().port}`
-    )
-  })
+const runSocketServer = (Nests) => {
 
-  WSS.on('connection', ws => {
+  console.log(`Socket.IO server running on port ${io.httpServer.address().port}`);
+
+  io.on('connection', (socket) => {
 
     const start = Date.now(); //delete after done using to test
 
-    ws.on('message', message => {
+
+
+    socket.on('message', message => {
       const data = safeParseJSON(message)
 
       console.log('\nData Recieved: \n %o', data);
@@ -45,62 +55,78 @@ const runSocketServer = (connectedNodes) => {
             })
           )
         )
-      } else if (typeof data.topic === 'string' && Topics[data.topic]) {
+      } else if (typeof data.NestID === 'string') {
         
         if(data.instructions == null) { // initializes node if the message isnt an instruction
-          let newNode = null, isInit = false;
-          if (data.type == "dependent") {
-            newNode = new DependentNode(data.topic, data.sourceID, ws, data.state);
+          let newElement = null, isInit = false; 
+          if (data.targetID == null) { // Element and not a controller
+            newElement = new Element(data.NestID, data.sourceID, socket, data.state);
             isInit = true;
-          } else if (data.type == "independent") {
+          } else { // Element should be a controller if there is a element targetID
 
-            //independent node created and target is set
-            newNode = new IndependentNode(data.topic, data.sourceID, ws, data.state);
+            //Controller element created and target is set
+            newElement = new Controller(data.NestID, data.sourceID, socket, data.state);
+            if(returnElementFromNests(Nests, data.targetID) != null) {
+              newElement.setTarget(returnElementFromNests(Nests, data.targetID))
 
-            for (let n of connectedNodes) { 
-              if(data.targetID == n.getID()) {
-                newNode.setTarget(n);
-                console.log('\ntarget ID of %s set to : %s',newNode.getID(), newNode);
-		console.log(`\nTarget ID of ${newNode.getID()} set to => ${newNode.getTarget().getID()}`);
+              ws.send(JSON.stringify( 
+                generateTargetSuccess({
+                  NestID: newElement.getNestID(),
+                  sourceID: newElement.getID(),
+                  targetID: newElement.getTarget()
+              })))
+
+              isInit = true
+            } else { // target not found
+              console.log('\nTarget doesnt exist')
+            }
+            
+            /*for (let n of Nests) { 
+              if(data.targetID == e.getSourceID()) {
+                newElement.setTarget(e);
+                console.log('\ntarget ID of %s set to : %s',newElement.getID(), newElement);
+		            console.log(`\nTarget ID of ${newElement.getID()} set to => ${newElement.getTarget().getID()}`);
 
                 ws.send(JSON.stringify( 
                   generateTargetSuccess({
-                    topic: newNode.getTopic(),
-                    sourceID: newNode.getID(),
-                    targetID: newNode.getTarget()
+                    NestID: newElement.getNestID(),
+                    sourceID: newElement.getID(),
+                    targetID: newElement.getTarget()
                 })))
               }
             
             isInit = true;
-            }
+            }*/
 
           }
 
-          ws.send(JSON.stringify(
+          socket.send(JSON.stringify(
             generateInitialization({ // for testing purposes
-            topic: newNode.getTopic(),
-            sourceID: newNode.getID(),
-            targetID: newNode.getTarget(),
+            NestID: newElement.getNestID(),
+            sourceID: newElement.getID(),
+            targetID: newElement.getTarget(),
             type: data.type,
-            state: newNode.getState()
+            state: newElement.getState()
           })))
 
-          connectedNodes.add(newNode);
+          connectedNodes.add(newElement);
+        } else if(data.instructions != null) {
+          // data needs to be routed
         }
 
-        Topics[data.topic](WSS, ws, data, connectedNodes); // hand socket connection and data to desired topic
+        //NestIDs[data.NestID](WSS, socket, data, connectedNodes); // hand socket connection and data to desired NestID
 
       } else {
-        ws.send(
+        socket.send(
           JSON.stringify(
             generateError({
-              error: 'Topic Not Found',
+              error: 'NestID Not Found',
               reasons: [
                 {
-                  reason: 'invalid_topic',
-                  message: 'Unable to find matching topic',
+                  reason: 'invalid_NestID',
+                  message: 'Unable to find matching NestID',
                   data: data.method,
-                  location: 'topics'
+                  location: 'NestIDs'
                 }
               ]
             })
@@ -109,7 +135,7 @@ const runSocketServer = (connectedNodes) => {
       }
     });
 
-    ws.on('close', message => {
+    socket.on('close', message => {
 
       const end = Date.now(); //delete after done using to test
 

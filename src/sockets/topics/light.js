@@ -1,6 +1,6 @@
-const { IndependentNode, DependentNode } = require('./node_declerations');
+const { IndependentNode, DependentNode } = require('../element');
 
-const{ generateError } = require('../../helpers');
+const{ generateError } = require('../../instructions');
 
 module.exports = (wss, ws, data, connectedNodes) => { // this blcok is for new nodes being that are initializing their first connection
 
