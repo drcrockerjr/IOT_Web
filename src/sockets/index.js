@@ -4,7 +4,7 @@ const { Server } = require("socket.io");
 const io = new Server(8080);
 
 
-const { Nest, routeIntructions, returnElementFromNests } = require('./nest.js');
+const { Nest, routeIntructions, returnElementFromNests, addElementToNests } = require('./nest.js');
 
 const { safeParseJSON, generateError, InitHandshake, generateTargetSuccess } = require('../instructions.js');
 
@@ -57,7 +57,7 @@ const runSocketServer = (Nests) => {
         )
       } else if (typeof data.NestID === 'string') {
         
-        if(data.instructions == null) { // initializes node if the message isnt an instruction
+        if(data.instructions == null) { // initializes element if the message isnt an instruction
           let newElement = null, isInit = false; 
           if (data.targetID == null) { // Element and not a controller
             newElement = new Element(data.NestID, data.sourceID, socket, data.state);
@@ -110,6 +110,10 @@ const runSocketServer = (Nests) => {
           })))
 
           connectedNodes.add(newElement);
+
+          addElementToNests( Nests, newElement, newElement)
+
+
         } else if(data.instructions != null) {
           // data needs to be routed
         }

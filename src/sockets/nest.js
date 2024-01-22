@@ -1,6 +1,19 @@
+/**
+ * ${1:Description placeholder}
+ * @date 1/1/2024 - 11:08:33 PM
+ *
+ * @type {*}
+ */
 const { Element, Controller } = require('./element.js')
 
 class Nest {
+    /**
+ * Creates an instance of Nest.
+ * @date 1/1/2024 - 11:08:33 PM
+ *
+ * @constructor
+ * @param {*} RoomID
+ */
     constructor(RoomID){
         this.RoomID = RoomID;
         this.elements = new Set();
@@ -24,7 +37,8 @@ class Nest {
         return false
     } 
 
-    returnElementFromID = (id) => {
+
+returnElementFromID = (id) => {
         for(let element of this.elements) {
             if(element.getSourceID() == id) {
                 return element
@@ -32,7 +46,13 @@ class Nest {
         }
         return null
     }
-    printElements = () => {
+
+/**
+ * ${1:Description placeholder}
+ * @date 1/1/2024 - 11:08:33 PM
+ **/
+
+printElements = () => {
 
         console.log('NestID: %s \n Elements:',  )
         for(let element of this.elements) {
@@ -45,6 +65,14 @@ routeIntructions = (message) => {
 
 }
 
+/**
+ * Returns and element object based on id from nests provided.
+ * 
+ * @param {Nest[]} Nests - An array of Nest objects.
+ * @param {string} id - The element to be added to a nest.
+ * @return {Element} - The located element object or null if not found
+ **/
+
 returnElementFromNests = (Nests, id) => {
     for(let nest of Nests) {
         if(nest.hasElementFromID(id)) {
@@ -54,11 +82,18 @@ returnElementFromNests = (Nests, id) => {
     return null
 }
 
-addElementToNest = (Nests, element, id) => {
+/**
+ * Adds an element to the specified nest.
+ * 
+ * @param {Nest[]} Nests - An array of Nest objects.
+ * @param {Element} element - The element to be added to a nest.
+ **/
 
+addElementToNests = (Nests, element) => {
 
     let nestExists = false    
     let n = returnElementFromNests(Nests, id)
+    let newNest;
 
     for(let nest of Nests) {
         if(nest.getNestID() == element.getNestID()) {
@@ -67,11 +102,14 @@ addElementToNest = (Nests, element, id) => {
         }
     }
 
-    if(nestExists == false) {}
+    if(nestExists == false) {
+        newNest = new Nest(element.getNestID())
+        Nests.add(newNest)
+    }
 }
 
-addElementToNest ((Nests, element, id) => {
-
-})
-
-module.exports = { Nest, routeIntructions, returnElementFromNests , addElementToNest};
+module.exports = { 
+    Nest, 
+    routeIntructions, 
+    returnElementFromNests, 
+    addElementToNests };
